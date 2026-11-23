@@ -260,7 +260,7 @@ public class Program
 
     static void Task1()
     {
-        Console.WriteLine("\nЗадание 2 (проверка числа на простоту, число простое)");
+        Console.WriteLine("\nЗадание 2 (проверка числа на простоту, время в мс, число простое)");
         var rows = new List<ITableRow>();
         rows.Add(Row("N", "Перебор от 2 до N", "Только нечётные до N", "Перебор до sqrt(N)", "Нечётные до sqrt(N)"));
 
@@ -285,7 +285,7 @@ public class Program
 
     static void Task2()
     {
-        Console.WriteLine("\nЗадание 3 (НОД, M = N + 1, НОД = 1)");
+        Console.WriteLine("\nЗадание 3 (НОД, время в мс, M = N + 1, НОД = 1)");
         var rows = new List<ITableRow>();
         rows.Add(Row("N", "Массив делителей", "Перебор от 1 до min", "Перебор от min до 1", "Алгоритм Евклида"));
 
@@ -310,7 +310,7 @@ public class Program
 
     static void Task3()
     {
-        Console.WriteLine("\nДоп. задание 1 (НОК, M = N + 1, НОД = 1)");
+        Console.WriteLine("\nДоп. задание 1 (НОК, время в мс, M = N + 1, НОД = 1)");
         var rows = new List<ITableRow>();
         rows.Add(Row("N", "Массив кратных", "Перебор от max до M*N", "Через НОД (Евклид)"));
 
@@ -332,10 +332,51 @@ public class Program
         new Table("task3", rows).Print();
     }
 
+    static void Task4()
+    {
+        Console.WriteLine("\nДоп. задание 2 (сложность встроенной сортировки, время в мс)");
+        var rows = new List<ITableRow>();
+        rows.Add(Row("N", "Время сортировки", "N * log2(N)", "Время / (N * log2(N)), нс"));
+
+        Random rng = new Random(12345);
+        int[] sizes = { 10_000, 50_000, 100_000, 500_000, 1_000_000, 5_000_000, 10_000_000 };
+
+        foreach (int n in sizes)
+        {
+            int trials = n <= 1_000_000 ? 5 : 2;
+            double totalMs = 0;
+
+            for (int t = 0; t < trials; t++)
+            {
+                int[] data = new int[n];
+
+                for (int i = 0; i < n; i++)
+                {
+                    data[i] = rng.Next();
+                }
+
+                Stopwatch sw = Stopwatch.StartNew();
+                Array.Sort(data);
+                sw.Stop();
+
+                totalMs += sw.Elapsed.TotalMilliseconds;
+            }
+
+            double ms = totalMs / trials;
+            double nLogN = n * Math.Log2(n);
+            double ratio = ms * 1_000_000 / nLogN;
+
+            rows.Add(Row(n, ms.ToString("F4"), Math.Round(nLogN), ratio.ToString("F4")));
+        }
+
+        new Table("task4", rows).Print();
+    }
+
     public static void Main(string[] args)
     {
         Task1();
         Task2();
         Task3();
+        Task4();
     }
 }
